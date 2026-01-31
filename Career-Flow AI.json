@@ -1,0 +1,1466 @@
+{
+  "name": "Career-Flow AI",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $json.Link }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2544,
+        1296
+      ],
+      "id": "6573884d-2313-4202-82d0-8cc404eb212f",
+      "name": "Read HTTP with Jina AI",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "11111111-2222-3333-4444-555555555555",
+              "leftValue": "={{ $json[\"Final Decision\"] }}",
+              "rightValue": "approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        1344
+      ],
+      "id": "2e141aad-dafe-47ab-bc8e-0853d0db7e62",
+      "name": "Approved?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1234",
+              "name": "cv",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2528,
+        1472
+      ],
+      "id": "1bf2e0db-74f7-45ba-bdd2-42c01d5d53c0",
+      "name": "Prepare Resume"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "feedUrl": "https://weworkremotely.com/categories/remote-devops-sysadmin-jobs.rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3776,
+        1264
+      ],
+      "id": "984b2c29-e2b0-462d-8489-1dc7b963d7a5",
+      "name": "RSS: WeWorkRemotely"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 10
+            }
+          ]
+        },
+        "feedUrl": "https://remoteok.com/rss"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3776,
+        1408
+      ],
+      "id": "6dd5531c-40fd-414f-b7cf-fd05fdd52d44",
+      "name": "RSS: RemoteOK"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 20
+            }
+          ]
+        },
+        "feedUrl": "https://hnrss.org/jobs"
+      },
+      "type": "n8n-nodes-base.rssFeedReadTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3776,
+        1568
+      ],
+      "id": "88389667-7281-4c81-aa92-cc4b906acf88",
+      "name": "RSS: HackerNews"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 30
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -4128,
+        1712
+      ],
+      "id": "77e2d246-c1cd-49c5-981d-ccf62795c752",
+      "name": "Cron: Every 1h"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "/home/ubuntu/Workflows/venv/bin/python3 /home/ubuntu/Workflows/job_scrapper.py --term \"DevOps\""
+      },
+      "id": "d597349b-b70b-4f60-a586-23e3c0556f32",
+      "name": "Py: LinkedIn Scraper",
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -3952,
+        1712
+      ],
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": "INSERT_YOUR_DOCUMENTID_AQUI",
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z1sK9hCIqAHVcU3bDpEMJLiQCQ-NAwavp7rI-xd6R8E/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3344,
+        1376
+      ],
+      "id": "50e12d97-cc3f-4556-8441-b12bf257e6d6",
+      "name": "Sheets: Get Job History",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -2704,
+        1296
+      ],
+      "id": "084e0f05-bd04-41a8-9bb4-ff153aa7baa6",
+      "name": "Limit: 1 Job per Execution"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "INSERT_YOUR_DOCUMENTURL_AQUI"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        -2704,
+        1472
+      ],
+      "id": "f7720bc3-b090-4114-b855-79e13fac2bf1",
+      "name": "GDoc: Get Current Resume",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -2368,
+        1312
+      ],
+      "id": "5a453fc0-a465-44db-954d-a96614c4e8ea",
+      "name": "Merge: Consolidate Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9c2cb73-efca-4f12-bee7-5b1cab9e5707",
+              "name": "my_resume",
+              "value": "={{ $json.cv }}",
+              "type": "string"
+            },
+            {
+              "id": "903581e0-e131-4f20-b080-01fb9161b84c",
+              "name": "linkedin",
+              "value": "SEU_LINKEDIN",
+              "type": "string"
+            },
+            {
+              "id": "f2b7a51d-1af4-45c0-948e-2c21689ad0fa",
+              "name": "portfolio",
+              "value": "SEU_PORTFOLIO",
+              "type": "string"
+            },
+            {
+              "id": "9c3ed8c8-c504-455a-bae5-e0459fff1f2a",
+              "name": "contact",
+              "value": "SEU_CONTACT",
+              "type": "string"
+            },
+            {
+              "id": "9b256946-88a0-4f7a-a75f-3711b0b8ae44",
+              "name": "job_text",
+              "value": "={{ ($json.data || $json.content || \"\").length > 50 ? ($json.data || $json.content) : \"⚠️ The full description could not be loaded automatically.\\n\\nRole: \" + ($json.title || \"Not informed\") + \"\\nLink for manual analysis: \" + ($json.link || $json.Link) }}",
+              "type": "string"
+            },
+            {
+              "id": "f3cf817f-211d-4e03-b195-053ce77c39a8",
+              "name": "name",
+              "value": "SEU_NAME",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2176,
+        1312
+      ],
+      "id": "422437c6-cf00-4928-8e96-6294eb390d04",
+      "name": "Set: Map Analysis Variables"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=gemini --prompt 'You are a Senior Technical Recruiter.\nYour mission is to be CRITICAL and ANALYTICAL when comparing the resume with the job description.\n\nRESUME:\n{{ $('Prepare Resume').item.json.cv.replace(/\\x27/g, \"\") }}\n\nJOB DESCRIPTION:\n{{ $json.job_text.replace(/\\x27/g, \"\") }}\n\nTASK: Decide if the candidate should apply for this position.\n\nDECISION RULES (FOR THE MATCH FIELD):\n1. MANDATORY: If the job requires a \"Core\" technology (e.g., Docker, Kubernetes, AWS) that is NOT in the resume, the match is FALSE.\n2. LEVEL: If the job is explicitly \"Senior\" or \"Staff\" and the resume is Junior/Mid-level, the match is FALSE.\n3. LANGUAGE: If the job requires Fluent English and the resume does not mention English, the match is FALSE.\n4. WEIGHT: The match should be TRUE only if there is at least 75% technical alignment.\n\nRETURN ONLY A PURE JSON:\n{\n  \"match\": boolean,\n  \"detected_level\": \"Junior\" | \"Mid-level\" | \"Senior\" | \"Specialist\",\n  \"contact_email\": \"string\",\n  \"summary\": \"short string\",\n  \"justification\": \"Explain in 1 sentence why it matched or not (e.g., lacks experience with Terraform).\"\n}\n\nIMPORTANT: If the job description is invalid or there is a reading error, match is false and justification is \"Reading error\".'"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        1424
+      ],
+      "id": "e0b1c7bd-187a-4626-b36e-0a10b28f8986",
+      "name": "AI: Analyze Match (Gatekeeper)",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst sshOutput = items[0].json;\nlet rawText = sshOutput.stdout || sshOutput.text || \"\";\n\n// Cleanup to isolate JSON content between curly braces { }\nconst cleanText = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '').trim();\n\ntry {\n  const jsonData = JSON.parse(cleanText);\n\n  return {\n    match: jsonData.match === true,\n    detected_level: jsonData.detected_level || '',\n    contact_email: jsonData.contact_email || 'Not Found',\n    summary: jsonData.summary || '',\n    justification: jsonData.justification || 'No justification provided.',\n    \n    // Injecting job data to prevent \"Paired Item\" errors in downstream nodes (e.g., Google Sheets)\n    // Note: Ensure the node name 'JS: Smart Deduplication' matches your actual node name\n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    \n    // Re-adding the debug object to ensure conditional nodes (If) don't fail\n    _debug: { \n      status: (sshOutput.code !== undefined) ? sshOutput.code : 0 \n    }\n  };\n} catch (e) {\n  // If parsing fails, send status 1 to steer the flow toward the error/log path\n  return { \n    match: false, \n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    summary: \"Processing error\", \n    justification: \"Failed to parse AI JSON output.\",\n    _debug: { status: 1 } \n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1648,
+        1424
+      ],
+      "id": "316f2d45-bc8c-453c-9c2d-48076970ba57",
+      "name": "JS: Clean AI Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0817caf4-c0f0-4c87-afa9-fe5b889cc91e",
+              "leftValue": "={{ $json.Match }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1104,
+        1440
+      ],
+      "id": "617694bf-ec7e-45d8-bad0-96b1f209768f",
+      "name": "If: Got Match?"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=gemini \"You are an expert technical cover letter writer specializing in tech roles.\n\nTASK: Write a persuasive and tailored cover letter.\n\nCANDIDATE INFORMATION:\nName: {{ $('Set: Map Analysis Variables').first().json.name }}\n{{ $('Set: Map Analysis Variables').first().json.my_resume.replace(/'/g, \"\") }}\n\nLinkedIn: {{ $('Set: Map Analysis Variables').first().json['my_linkedin'].replace(/'/g, \"\") }}\nPortfolio: {{ $('Set: Map Analysis Variables').first().json.portfolio.replace(/'/g, \"\") }}\nContact: {{ $('Set: Map Analysis Variables').first().json.your_contact.replace(/'/g, \"\") }}\n\nJOB DESCRIPTION:\n{{ $('Set: Map Analysis Variables').first().json.job_text.replace(/'/g, \"\") }}\n\nJOB ANALYSIS (context):\nLevel: {{ $('JS: Clean AI Response').first().json.detected_level.replace(/'/g, \"\") }}\nTarget Email: {{ $('JS: Clean AI Response').first().json.contact_email.replace(/'/g, \"\") }}\n\nCOVER LETTER INSTRUCTIONS:\n1. STRUCTURE (in formatted HTML): Greeting, Why this role, Core Qualifications (3-4 bullet points), Value Proposition, and Professional Closing.\n2. TONE OF VOICE: Professional, authentic, and direct.\n3. OUTPUT FORMAT: Return ONLY a pure JSON (no markdown) with the fields 'subject' and 'body_html'.\" 2>/dev/null"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        1360
+      ],
+      "id": "8d1fec1a-8cf4-4e40-acd7-5d5cbb577874",
+      "name": "AI: Generate Cover Letter",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ================================================================\n// SSH COVER LETTER PROCESSING LOGIC\n// Node: Code (after the Cover Letter SSH node)\n// ================================================================\n\n// Capture the output from the SSH execution\nconst sshOutput = $input.all()[0].json;\n\n// SSH usually returns an array; we target the first element\nconst firstResult = Array.isArray(sshOutput) ? sshOutput[0] : sshOutput;\n\n// Extract stdout (where the Gemini response is located)\nlet rawText = '';\n\nif (firstResult.stdout) {\n  rawText = firstResult.stdout;\n} else if (firstResult.text) {\n  rawText = firstResult.text;\n} else {\n  rawText = JSON.stringify(firstResult);\n}\n\n// Validate if any text was actually captured\nif (!rawText || rawText.trim() === '') {\n  return {\n    error: \"No output received from Gemini CLI for cover letter\",\n    debug_data: firstResult,\n    code: firstResult.code || 'unknown',\n    stderr: firstResult.stderr || ''\n  };\n}\n\n// Sanitize the string by removing Markdown code blocks (```json and ```)\nconst cleanText = rawText\n  .replace(/```json\\s*/g, '')\n  .replace(/```\\s*/g, '')\n  .trim();\n\n// Attempt to parse the sanitized JSON\ntry {\n  const coverLetter = JSON.parse(cleanText);\n  \n  // Validate presence of mandatory fields\n  if (!coverLetter.subject || !coverLetter.body_html) {\n    return {\n      error: \"Valid JSON found but missing required fields: 'subject' or 'body_html'\",\n      parsed_data: coverLetter,\n      raw_text: rawText\n    };\n  }\n  \n  // Return processed data formatted for the \"Wait/Approval\" node\n  return {\n    subject: coverLetter.subject,\n    body_html: coverLetter.body_html,\n    // Optional debug metadata\n    _debug: {\n      ssh_code: firstResult.code,\n      has_stderr: !!firstResult.stderr,\n      text_length: coverLetter.body_html.length\n    }\n  };\n  \n} catch (parseError) {\n  // If parsing fails, return structured error details\n  return {\n    error: \"Failed to parse cover letter JSON\",\n    parse_error: parseError.message,\n    raw_text: rawText,\n    clean_text: cleanText,\n    ssh_code: firstResult.code,\n    ssh_stderr: firstResult.stderr\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        1360
+      ],
+      "id": "e66f2a4f-b909-4251-8de2-42640af5d8d8",
+      "name": "JS: Format Cover Letter JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const bodyHtml = $node[\"JS: Format Cover Letter JSON\"].json.body_html;\n\n// Modern CSS for the generated PDF\nconst styledHtml = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<style>\n    body { font-family: 'Helvetica', 'Arial', sans-serif; padding: 50px; line-height: 1.6; color: #333; }\n    .header { border-bottom: 2px solid #007bff; margin-bottom: 30px; padding-bottom: 10px; }\n    .content { text-align: justify; white-space: pre-wrap; }\n    .footer { margin-top: 50px; font-size: 10px; color: #888; text-align: center; }\n    strong { color: #007bff; }\n</style>\n</head>\n<body>\n    <div class=\"header\">\n        <h2>Technical Application</h2>\n    </div>\n    <div class=\"content\">\n        ${bodyHtml}\n    </div>\n    <div class=\"footer\">\n        Generated automatically by Career-Flow AI\n    </div>\n</body>\n</html>\n`;\n\nreturn {\n  html_final: styledHtml,\n  // Filename using job title and candidate name from previous nodes\n  filename: `Cover_Letter_${$('JS: Smart Deduplication').first().json.title.replace(/[^a-z0-9]/gi, '_')}.pdf`\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -416,
+        1360
+      ],
+      "id": "ff41b64b-750a-4d61-bb8e-5cd7933dca81",
+      "name": "JS: Generate HTML Template for PDF"
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=echo '{{ $json.html_final }}' > /tmp/input.html && wkhtmltopdf --quiet /tmp/input.html /tmp/output.pdf && cat /tmp/output.pdf | base64 -w 0 && rm /tmp/input.html /tmp/output.pdf"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        1360
+      ],
+      "id": "cc89591c-fcdc-4d97-9259-e3c90ae7d8e5",
+      "name": "SSH: Convert HTML to PDF (wkhtmltopdf)",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "privateKey",
+        "command": "=gemini -p \"You are a tech job candidate sending an email to a recruiter. The Cover Letter is already written (attached as a PDF). Your task is to write ONLY the EMAIL BODY.\n\nRULES:\n1. Be brief (maximum 3 paragraphs).\n2. Mention that the detailed cover letter is attached in PDF format.\n3. Use a professional and friendly tone.\n4. Language: Use the same language as the job description (based on the context below).\n\nCONTEXT:\nJob Title: {{ $('JS: Smart Deduplication').first().json.title }}\nJob Summary: {{ $('Set: Map Analysis Variables').first().json.job_text }}\n\nOUTPUT:\nReturn only the plain text of the email, no JSON, no markdown.\" 2>/dev/null"
+      },
+      "type": "n8n-nodes-base.ssh",
+      "typeVersion": 1,
+      "position": [
+        160,
+        1312
+      ],
+      "id": "8116674a-d4f7-4352-a547-63541edd0405",
+      "name": "AI: Generate Email Body",
+      "credentials": {
+        "sshPrivateKey": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SSH Private Key account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": "INSERT_YOUR_GUILDID_AQUI",
+        "channelId": "INSERT_YOUR_CHANNELID_AQUI",
+        "options": {},
+        "embeds": {
+          "values": [
+            {
+              "description": "=### 📋 Gemini's Summary\n{{ $node[\"JS: Clean AI Response\"].json.summary }}\n\n### ✅ Justificative\n{{ $node[\"JS: Clean AI Response\"].json.justification }}\n\n-----\n👉 **[APROVAR CANDIDATURA]({{ $execution.resumeUrl }}?acao=aprovado)**",
+              "title": "=🎯 Job Analisis: {{ $node[\"JS: Smart Deduplication\"].json.title }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        544,
+        1344
+      ],
+      "id": "67832df7-a542-4afa-b347-a48af49aa697",
+      "name": "Discord: Notify Job for Approval",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI",
+      "credentials": {
+        "discordBotApi": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Revisão de Candidatura",
+        "formDescription": "Edite o texto ou cancele o envio.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Subject",
+              "defaultValue": "={{ $('JS: Format Cover Letter JSON').item.json.subject }}"
+            },
+            {
+              "fieldLabel": "Email Body",
+              "fieldType": "textarea",
+              "defaultValue": "={{ $('AI: Generate Email Body').item.json.stdout }}"
+            },
+            {
+              "fieldLabel": "Cover Letter PDF",
+              "defaultValue": "={{ $('AI: Generate Cover Letter').item.json.stdout }}"
+            },
+            {
+              "fieldLabel": "Final Decision",
+              "fieldType": "dropdown",
+              "defaultValue": "aprovado",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Approved"
+                  },
+                  {
+                    "option": "Rejected"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        1344
+      ],
+      "id": "fd57bc28-fa52-47fe-abb7-2b67eb2fe689",
+      "name": "Wait: Application Review",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": "INSERT_YOUR_GUILDID_AQUI",
+        "channelId": "INSERT_YOUR_CHANNELID_AQUI",
+        "content": "=⚠️ **Atenção:** O Gemini não encontrou e-mail de contato nesta vaga.\n\nO envio automático foi cancelado.\n👉 [Clique aqui para aplicar manualmente no site]\n{{ $('JS: Lógica de Deduplicação').item.json.Link }}",
+        "options": {},
+        "embeds": {
+          "values": [
+            {
+              "description": "=...\n📄 **Resumo:** {{ $json.resumo }}\n📧 **Destinatário:** {{ $json.email_contato ? $json.email_contato : \"⚠️ Nenhum e-mail encontrado (Aplicar via Link)\" }}\n\n-----------------------------------\n👉 [APROVAR ENVIO]({{ $execution.resumeUrl }}?acao=aprovado)",
+              "color": "#00FF00",
+              "title": "🎯 Análise de Vaga Detectada"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -672,
+        1584
+      ],
+      "id": "18ee4626-05bc-4b35-ae39-316d402ee908",
+      "name": "Discord: Alert - Email Not Found",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI",
+      "credentials": {
+        "discordBotApi": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": "INSERT_YOUR_GUILDID_AQUI",
+        "channelId": "INSERT_YOUR_CHANNELID_AQUI",
+        "content": "=⚠️ **Attention:** Gemini analyzed a job, but it was not a match.\n\nReview if you still want to apply manually:\n{{ $('JS: Clean AI Response').item.json.job_link }}\n\n**Gemini Summary:**\n{{ $('JS: Clean AI Response').item.json.summary }}\n\n**Justification:**\n{{ $('JS: Clean AI Response').item.json.justification }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        1584
+      ],
+      "id": "0268050c-1399-41ea-b1c0-219bf19b25c8",
+      "name": "Discord: Alert - No Technical Match",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI",
+      "credentials": {
+        "discordBotApi": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": "INSERT_YOUR_GUILDID_AQUI",
+        "channelId": "INSERT_YOUR_CHANNELID_AQUI",
+        "content": "🚫 **Envio Cancelado Manualmente**\nA vaga foi processada mas você optou por não enviar a candidatura.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        1520
+      ],
+      "id": "bd930031-7716-4a48-89fe-084bf3672141",
+      "name": "Discord: Log - Sending Cancelled",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI",
+      "credentials": {
+        "discordBotApi": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@exemple.com",
+        "toEmail": "={{ $('JS: Clean AI Response').item.json.email_contato }}",
+        "subject": "={{ $node[\"Wait: Application Review\"].json[\"Subject\"] }}",
+        "html": "={{ $node[\"Wait: Application Review\"].json[\"Email Body\"] }}",
+        "options": {
+          "attachments": "={{ $('File: PDF Binary').first().binary.data }}"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1056,
+        1328
+      ],
+      "id": "be95782b-e736-49e9-91e5-eee501514603",
+      "name": "SMTP: Send Application",
+      "webhookId": "INSERT_YOUR_WEBHOOKID_AQUI",
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "SMTP Gmail - lucasleninhf"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "INSERT_YOUR_DOCUMENTID_AQUI",
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Z1sK9hCIqAHVcU3bDpEMJLiQCQ-NAwavp7rI-xd6R8E/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Link": "={{ $('JS: Clean AI Response').item.json.job_link }}",
+            "Job Title": "={{ $('JS: Clean AI Response').item.json.job_title }}",
+            "Match": "={{ $json.match }}",
+            "Date": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job Title",
+              "displayName": "Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Link",
+              "displayName": "Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Match",
+              "displayName": "Match",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1264,
+        1440
+      ],
+      "id": "d18dcdd1-fc9a-47c5-86c9-3d0d67e72464",
+      "name": "Sheets: Register Processing Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_CREDENCIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ================================================================\n// LINKEDIN JOB PROCESSING (PYTHON JOBSPY)\n// ================================================================\n\n// 1. Capture the stdout text from the SSH terminal execution\nconst sshItem = $input.all()[0];\nconst sshOutput = sshItem.json.stdout;\n\nif (!sshOutput) return [];\n\ntry {\n  // Parse the JSON string returned by Python into an Object\n  const jobs = JSON.parse(sshOutput);\n\n  // Return empty if there's an error in the output or no jobs found\n  if (jobs.error || jobs.length === 0) return [];\n\n  // Map to the format expected by \"Merge\" and \"Deduplication\" nodes\n  return jobs.map(job => {\n    return {\n      json: {\n        // Use lowercase 'link' to match RSS format and pass through duplication filters\n        link: job.job_url, \n        \n        title: job.title,\n        \n        // JobSpy might not include the full body, so we initialize as empty.\n        // The \"Fetch Job Content (Jina AI)\" node will populate this later.\n        content: \"\", \n        \n        // Use LinkedIn ID as guid to prevent duplicates\n        guid: job.id,\n        \n        // Current timestamp as a fallback for publication date\n        pubDate: new Date().toISOString(),\n        \n        // Metadata to track the source\n        source_feed: \"LinkedIn Scraper\"\n      }\n    };\n  });\n\n} catch (e) {\n  // Return structured error for n8n debugging\n  return [{ \n    json: { \n      error: 'Failed to parse Python JSON output', \n      details: e.message \n    } \n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3776,
+        1712
+      ],
+      "id": "be9537c1-96c2-458a-ac19-676b90b0bd6e",
+      "name": "JS: Process LinkedIn Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f7441663-2248-4480-985e-4d43f52bb1a4",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "245e1c31-4f30-48a1-bf57-571bd523fd34",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "9453889b-9f9c-4f52-9e12-4ba909b77264",
+              "name": "guid",
+              "value": "={{ $json.guid }}",
+              "type": "string"
+            },
+            {
+              "id": "2bbd6198-0153-43cc-92ba-75052e21cd19",
+              "name": "pubDate",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            },
+            {
+              "id": "87a34b74-58d8-4092-ba63-72eed574bf53",
+              "name": "source_feed",
+              "value": "={{ $json.source_feed }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3600,
+        1712
+      ],
+      "id": "c3e75fcb-2d8b-4ce7-9154-2f179c5ac2bf",
+      "name": "Set: Format LinkedIn Job"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "32a0c62b-96f9-4dd8-ab97-929cf0a9fdac",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "74130eab-09d5-48f1-b8e4-76735c5d890d",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "19d58149-ae27-47ab-a67e-24574a3f9d6e",
+              "name": "content",
+              "value": "={{ $json.contentSnippet || $json.description || $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3536,
+        1312
+      ],
+      "id": "8be69f51-c68a-4498-8582-1be858b65777",
+      "name": "Set: Normalize RSS"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3072,
+        1328
+      ],
+      "id": "fd49e3a7-4ff4-402f-bab7-89935b44ec5f",
+      "name": "Merge: Unify Sources (RSS/LinkedIn/Sheets)"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        368,
+        1344
+      ],
+      "id": "67914e21-18d8-447e-b4d3-5a62af541217",
+      "name": "Merge: Data for Notification"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "stdout",
+        "options": {
+          "fileName": "={{ $node[\"JS: Generate HTML Template for PDF\"].json.filename }}."
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        1360
+      ],
+      "id": "e412b5ff-fe6b-4dbc-aab3-e07df3f18dfe",
+      "name": "File: PDF Binary"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "75482421-9296-42aa-a270-a62af677c30a",
+              "leftValue": "={{ $json._debug.status }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1456,
+        1424
+      ],
+      "id": "67f68aa4-4183-46e4-aa84-486039b7405c",
+      "name": "IF: Error in Gemini?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7a5d4593-9741-416f-90a5-94d936fbceaa",
+              "leftValue": "={{ $json.texto_vaga }}",
+              "rightValue": "⚠️ The full description could not be loaded automatically.",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1984,
+        1312
+      ],
+      "id": "665a15db-d109-4718-bd30-039f62437461",
+      "name": "IF: Error in Jina AI?"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $('Set: Mapear Variáveis de Análise').item.json.texto_vaga }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1824,
+        1216
+      ],
+      "id": "4a2281b6-7df7-4d3b-98a1-9b5bfb27ab67",
+      "name": "ERROR: Jina AI"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ $('AI: Analisar Match (Gatekeeper)').item.json.stderr }}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        1280
+      ],
+      "id": "c090225e-de6c-49ef-aa3a-45afc48148ac",
+      "name": "ERROR: Gemini"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f889110-d29c-423b-a743-99d6f3a659f8",
+              "leftValue": "={{ $('JS: Clean AI Response').first().json.contact_email || \"Not found\" }}",
+              "rightValue": "Not Found",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -928,
+        1376
+      ],
+      "id": "339180b1-dbc6-4e73-b308-5e1fc52aa163",
+      "name": "IF: Has email in job?"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ================================================================\n// DEDUPLICATION LOGIC VIA GOOGLE SHEETS\n// ================================================================\n\n// 1. Capture all items coming from the \"Merge\" node\nconst allItems = $input.all();\n\n// 2. Separate entries based on data structure:\n// - RSS items have the \"link\" field (lowercase) and \"guid\"\n// - Google Sheets items have the \"Link\" field (Capitalized - per your Append node)\nconst sheetsHistory = [];\nconst newRSSJobs = [];\n\nallItems.forEach(item => {\n  const json = item.json;\n  \n  // If it has the \"Link\" column (from Sheets) and no \"guid\" (from RSS), it is history\n  if (json.Link && !json.guid) {\n    sheetsHistory.push(json);\n  } \n  // If it has \"link\" and \"guid\", it is a new job from the RSS/Scraper\n  else if (json.link) {\n    newRSSJobs.push(json);\n  }\n});\n\n// 3. Create a \"Set\" with historical links for O(1) fast lookup\n// Normalize strings by trimming to avoid duplicates due to formatting\nconst processedLinks = new Set(\n  sheetsHistory.map(row => {\n    return row.Link ? row.Link.trim() : \"\";\n  })\n);\n\n// 4. Helper function to clean URLs (removes tracking parameters if necessary)\nconst cleanUrl = (url) => {\n  if (!url) return \"\";\n  try {\n    const u = new URL(url);\n    // Returns the base URL. For RSS, the full link is usually the unique identifier.\n    return url.trim(); \n  } catch (e) {\n    return url;\n  }\n};\n\n// 5. Filter unique RSS jobs\nconst uniqueJobs = newRSSJobs.filter(job => {\n  const jobLink = cleanUrl(job.link);\n  \n  // THE MAGIC: If the link is NOT in the historical Set, it is a new job\n  const alreadyExists = processedLinks.has(jobLink);\n  \n  // Debug: Log ignored duplicate jobs if needed\n  // if (alreadyExists) console.log(`Ignoring duplicate job: ${job.title}`);\n  \n  return !alreadyExists;\n});\n\n\n// 6. Add useful metadata (job source) and return\nreturn uniqueJobs.map(job => {\n  let source = \"Other\";\n  const url = job.link || \"\";\n  \n  if (url.includes(\"weworkremotely\")) source = \"WWR\";\n  else if (url.includes(\"remotive\")) source = \"Remotive\";\n  else if (url.includes(\"remoteok\")) source = \"RemoteOK\";\n  else if (url.includes(\"linkedin\")) source = \"LinkedIn\";\n\n  return {\n    ...job,\n    job_source: source,\n    // Ensures the \"Link\" field (Capitalized) exists for future Google Sheets Append\n    Link: url \n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2880,
+        1296
+      ],
+      "id": "c3cb8660-17c9-4c85-ab86-9b4beb9bbc1c",
+      "name": "JS: Smart Deduplication"
+    },
+    {
+      "parameters": {
+        "content": "\nTo setup the environment, run python3 -m venv venv && ./venv/bin/pip install -U python-jobspy pandas"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -4032,
+        1856
+      ],
+      "id": "622aa310-e1f8-408b-95a0-5f5215b5c5c4",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cron: Every 1h": {
+      "main": [
+        [
+          {
+            "node": "Py: LinkedIn Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Py: LinkedIn Scraper": {
+      "main": [
+        [
+          {
+            "node": "JS: Process LinkedIn Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS: Process LinkedIn Data": {
+      "main": [
+        [
+          {
+            "node": "Set: Format LinkedIn Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Format LinkedIn Job": {
+      "main": [
+        [
+          {
+            "node": "Sheets: Get Job History",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge: Unify Sources (RSS/LinkedIn/Sheets)",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Sheets: Get Job History": {
+      "main": [
+        [
+          {
+            "node": "Merge: Unify Sources (RSS/LinkedIn/Sheets)",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set: Normalize RSS": {
+      "main": [
+        [
+          {
+            "node": "Merge: Unify Sources (RSS/LinkedIn/Sheets)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS: HackerNews": {
+      "main": [
+        [
+          {
+            "node": "Set: Normalize RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS: RemoteOK": {
+      "main": [
+        [
+          {
+            "node": "Set: Normalize RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS: WeWorkRemotely": {
+      "main": [
+        [
+          {
+            "node": "Set: Normalize RSS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge: Unify Sources (RSS/LinkedIn/Sheets)": {
+      "main": [
+        [
+          {
+            "node": "JS: Smart Deduplication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GDoc: Get Current Resume": {
+      "main": [
+        [
+          {
+            "node": "Prepare Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit: 1 Job per Execution": {
+      "main": [
+        [
+          {
+            "node": "Read HTTP with Jina AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read HTTP with Jina AI": {
+      "main": [
+        [
+          {
+            "node": "Merge: Consolidate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Resume": {
+      "main": [
+        [
+          {
+            "node": "Merge: Consolidate Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge: Consolidate Data": {
+      "main": [
+        [
+          {
+            "node": "Set: Map Analysis Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set: Map Analysis Variables": {
+      "main": [
+        [
+          {
+            "node": "IF: Error in Jina AI?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Error in Jina AI?": {
+      "main": [
+        [
+          {
+            "node": "ERROR: Jina AI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI: Analyze Match (Gatekeeper)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Analyze Match (Gatekeeper)": {
+      "main": [
+        [
+          {
+            "node": "JS: Clean AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS: Clean AI Response": {
+      "main": [
+        [
+          {
+            "node": "IF: Error in Gemini?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Error in Gemini?": {
+      "main": [
+        [
+          {
+            "node": "ERROR: Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Sheets: Register Processing Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheets: Register Processing Log": {
+      "main": [
+        [
+          {
+            "node": "If: Got Match?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If: Got Match?": {
+      "main": [
+        [
+          {
+            "node": "IF: Has email in job?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord: Alert - No Technical Match",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF: Has email in job?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Has email in job?": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Cover Letter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord: Alert - Email Not Found",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI: Generate Cover Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Generate Cover Letter": {
+      "main": [
+        [
+          {
+            "node": "JS: Format Cover Letter JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS: Format Cover Letter JSON": {
+      "main": [
+        [
+          {
+            "node": "JS: Generate HTML Template for PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS: Generate HTML Template for PDF": {
+      "main": [
+        [
+          {
+            "node": "SSH: Convert HTML to PDF (wkhtmltopdf)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SSH: Convert HTML to PDF (wkhtmltopdf)": {
+      "main": [
+        [
+          {
+            "node": "File: PDF Binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File: PDF Binary": {
+      "main": [
+        [
+          {
+            "node": "AI: Generate Email Body",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge: Data for Notification",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI: Generate Email Body": {
+      "main": [
+        [
+          {
+            "node": "Merge: Data for Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge: Data for Notification": {
+      "main": [
+        [
+          {
+            "node": "Discord: Notify Job for Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord: Notify Job for Approval": {
+      "main": [
+        [
+          {
+            "node": "Wait: Application Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait: Application Review": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "SMTP: Send Application",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord: Log - Sending Cancelled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JS: Smart Deduplication": {
+      "main": [
+        [
+          {
+            "node": "Limit: 1 Job per Execution",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GDoc: Get Current Resume",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "95df9ba3-d3a4-46b1-a688-687c30525f26",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2df28e8027d4e3389ccb1ad5346a0d2cf6750c995ec6ed332db1fbb1b44e6500"
+  },
+  "id": "dmGR1nZEJTRqoLlG4hLMD",
+  "tags": []
+}
