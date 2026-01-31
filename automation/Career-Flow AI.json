@@ -323,7 +323,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\nconst sshOutput = items[0].json;\nlet rawText = sshOutput.stdout || sshOutput.text || \"\";\n\n// Cleanup to isolate JSON content between curly braces { }\nconst cleanText = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '').trim();\n\ntry {\n  const jsonData = JSON.parse(cleanText);\n\n  return {\n    match: jsonData.match === true,\n    detected_level: jsonData.detected_level || '',\n    contact_email: jsonData.contact_email || 'Not Found',\n    summary: jsonData.summary || '',\n    justification: jsonData.justification || 'No justification provided.',\n    \n    // Injecting job data to prevent \"Paired Item\" errors in downstream nodes (e.g., Google Sheets)\n    // Note: Ensure the node name 'JS: Smart Deduplication' matches your actual node name\n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    \n    // Re-adding the debug object to ensure conditional nodes (If) don't fail\n    _debug: { \n      status: (sshOutput.code !== undefined) ? sshOutput.code : 0 \n    }\n  };\n} catch (e) {\n  // If parsing fails, send status 1 to steer the flow toward the error/log path\n  return { \n    match: false, \n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    summary: \"Processing error\", \n    justification: \"Failed to parse AI JSON output.\",\n    _debug: { status: 1 } \n  };\n}"
+        "jsCode": "const items = $input.all();\nconst sshOutput = items[0].json;\nlet rawText = sshOutput.stdout || sshOutput.text || \"\";\n\n// Cleanup to isolate JSON content between curly braces { }\nconst cleanText = rawText.replace(/^[^{]*/, '').replace(/[^}]*$/, '').trim();\n\ntry {\n  const jsonData = JSON.parse(cleanText);\n\n  return {\n    match: jsonData.match === true,\n    detected_level: jsonData.detected_level || '',\n    contact_email: jsonData.contact_email || 'Not Found',\n    summary: jsonData.summary || '',\n    justification: jsonData.justification || 'No justification provided.',\n    \n    // Injecting job data to prevent \"Paired Item\" errors in downstream nodes (e.g., Google Sheets)\n    // Note: Ensure the node name 'JS: Smart Deduplication' matches your actual node name\n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    \n    // Re-adding the debug object to ensure conditional nodes (If) don't fail\n    _debug: { \n      status: (sshOutput.code !== undefined) ? sshOutput.code : 0 \n    }\n  };\n} catch (e) {\n  // If parsing fails, send status 1 to steer the flow toward the error/log path\n  return { \n    match: false, \n    job_title: $('JS: Smart Deduplication').item.json.title,\n    job_link: $('JS: Smart Deduplication').item.json.Link,\n    summary: \"Processing error\", \n    justificative: \"Failed to parse AI JSON output.\",\n    _debug: { status: 1 } \n  };\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -463,7 +463,7 @@
         "embeds": {
           "values": [
             {
-              "description": "=### 📋 Gemini's Summary\n{{ $node[\"JS: Clean AI Response\"].json.summary }}\n\n### ✅ Justificative\n{{ $node[\"JS: Clean AI Response\"].json.justification }}\n\n-----\n👉 **[APROVAR CANDIDATURA]({{ $execution.resumeUrl }}?acao=aprovado)**",
+              "description": "=### 📋 Gemini's Summary\n{{ $node[\"JS: Clean AI Response\"].json.summary }}\n\n### ✅ Justificative\n{{ $node[\"JS: Clean AI Response\"].json.justification }}\n\n-----\n👉 **[APPROVE APPLICATION]({{ $execution.resumeUrl }}?acao=approved)**",
               "title": "=🎯 Job Analisis: {{ $node[\"JS: Smart Deduplication\"].json.title }}"
             }
           ]
@@ -539,7 +539,7 @@
         "resource": "message",
         "guildId": "INSERT_YOUR_GUILDID_AQUI",
         "channelId": "INSERT_YOUR_CHANNELID_AQUI",
-        "content": "=⚠️ **Atenção:** O Gemini não encontrou e-mail de contato nesta vaga.\n\nO envio automático foi cancelado.\n👉 [Clique aqui para aplicar manualmente no site]\n{{ $('JS: Lógica de Deduplicação').item.json.Link }}",
+        "content": "=⚠️ **Attention:** Gemini could not find a contact email for this position.\n\nAutomatic dispatch has been cancelled.\n👉 [Click here to apply manually on the website]\n{{ $('JS: Smart Deduplication').item.json.Link }}",
         "options": {},
         "embeds": {
           "values": [
@@ -596,7 +596,7 @@
         "resource": "message",
         "guildId": "INSERT_YOUR_GUILDID_AQUI",
         "channelId": "INSERT_YOUR_CHANNELID_AQUI",
-        "content": "🚫 **Envio Cancelado Manualmente**\nA vaga foi processada mas você optou por não enviar a candidatura.",
+        "content": "🚫 **Manual Cancellation**\nThe job was processed, but you chose not to send the application.",
         "options": {}
       },
       "type": "n8n-nodes-base.discord",
@@ -1456,7 +1456,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "95df9ba3-d3a4-46b1-a688-687c30525f26",
+  "versionId": "24c67450-a8c4-4e53-bbe2-4f4b262e9f1e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "2df28e8027d4e3389ccb1ad5346a0d2cf6750c995ec6ed332db1fbb1b44e6500"
